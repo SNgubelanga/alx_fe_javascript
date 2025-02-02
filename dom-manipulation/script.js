@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (conflictsDetected) {
             saveQuotes();
-            showNotification("New quotes were added from the server!", "info");
+            showNotification("Quotes synced with server!", "info");
         }
     }
 
@@ -176,6 +176,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000);
     }
 
+    // Export quotes to JSON file
+    function exportQuotesToJson() {
+        const dataStr = JSON.stringify(quotes, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "quotes.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Import quotes from JSON file
+    function importFromJsonFile(event) {
+        const fileReader = new FileReader();
+        fileReader.onload = function(event) {
+            const importedQuotes = JSON.parse(event.target.result);
+            quotes.push(...importedQuotes);
+            saveQuotes();
+            alert('Quotes imported successfully!');
+        };
+        fileReader.readAsText(event.target.files[0]);
+    }
+
     // Periodic Sync (every 30 seconds)
     setInterval(fetchQuotesFromServer, 30000);
 
@@ -183,6 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
     newQuoteButton.addEventListener("click", showRandomQuote);
     categoryFilter.addEventListener("change", filterQuotes);
     syncButton.addEventListener("click", manualSync);
+    document.getElementById("exportQuotes").addEventListener("click", exportQuotesToJson);
+    document.getElementById("importFile").addEventListener("change", importFromJsonFile);
 
     // Initialize
     createAddQuoteForm();
