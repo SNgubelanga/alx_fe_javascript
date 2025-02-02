@@ -8,13 +8,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const quoteDisplay = document.getElementById("quoteDisplay");
     const newQuoteButton = document.getElementById("newQuote");
     const categoryFilter = document.getElementById("categoryFilter");
-    const newQuoteText = document.getElementById("newQuoteText");
-    const newQuoteCategory = document.getElementById("newQuoteCategory");
-    const addQuoteButton = document.getElementById("addQuoteBtn");
+    const formContainer = document.getElementById("formContainer"); // Placeholder div for the form
     const importFileInput = document.getElementById("importFile");
     const exportQuotesButton = document.getElementById("exportQuotes");
 
-    // Function to populate the category dropdown
+    // Function to create the Add Quote Form dynamically
+    function createAddQuoteForm() {
+        formContainer.innerHTML = ""; // Clear existing form if any
+
+        const form = document.createElement("div");
+
+        const inputQuote = document.createElement("input");
+        inputQuote.id = "newQuoteText";
+        inputQuote.type = "text";
+        inputQuote.placeholder = "Enter a new quote";
+
+        const inputCategory = document.createElement("input");
+        inputCategory.id = "newQuoteCategory";
+        inputCategory.type = "text";
+        inputCategory.placeholder = "Enter quote category";
+
+        const addButton = document.createElement("button");
+        addButton.id = "addQuoteBtn";
+        addButton.textContent = "Add Quote";
+        addButton.onclick = addQuote;
+
+        form.appendChild(inputQuote);
+        form.appendChild(inputCategory);
+        form.appendChild(addButton);
+
+        formContainer.appendChild(form);
+    }
+
+    // Function to populate the category dropdown dynamically
     function populateCategories() {
         const uniqueCategories = [...new Set(quotes.map(q => q.category))];
         categoryFilter.innerHTML = ""; // Clear previous options
@@ -70,19 +96,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to add a new quote
     function addQuote() {
-        const text = newQuoteText.value.trim();
-        const category = newQuoteCategory.value.trim();
+        const newQuoteText = document.getElementById("newQuoteText").value.trim();
+        const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
-        if (text === "" || category === "") {
+        if (newQuoteText === "" || newQuoteCategory === "") {
             alert("Please enter both quote text and category.");
             return;
         }
 
-        quotes.push({ text, category });
+        quotes.push({ text: newQuoteText, category: newQuoteCategory });
         localStorage.setItem("quotes", JSON.stringify(quotes));
         populateCategories();
-        newQuoteText.value = "";
-        newQuoteCategory.value = "";
+        document.getElementById("newQuoteText").value = "";
+        document.getElementById("newQuoteCategory").value = "";
         alert("Quote added successfully!");
     }
 
@@ -94,9 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const a = document.createElement("a");
         a.href = url;
         a.download = "quotes.json";
-        document.body.appendChild(a); // Append link before clicking
+        document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a); // Remove after download
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
 
@@ -120,11 +146,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Event Listeners
     newQuoteButton.addEventListener("click", showRandomQuote);
-    addQuoteButton.addEventListener("click", addQuote);
+    categoryFilter.addEventListener("change", filterQuotes);
     importFileInput.addEventListener("change", importFromJsonFile);
     exportQuotesButton.addEventListener("click", exportQuotes);
 
     // Initialize
+    createAddQuoteForm();
     populateCategories();
     showRandomQuote();
 });
