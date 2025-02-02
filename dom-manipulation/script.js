@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
         showRandomQuote();
     }
 
-    // Function to add a new quote
-    function addQuote() {
+    // Function to add a new quote and send it to the server
+    async function addQuote() {
         const newQuoteText = document.getElementById("newQuoteText").value.trim();
         const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
@@ -92,10 +92,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const newQuote = { text: newQuoteText, category: newQuoteCategory, id: Date.now() };
-        quotes.push(newQuote);
-        saveQuotes();
-        populateCategories();
-        alert("Quote added successfully!");
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newQuote)
+            });
+
+            if (!response.ok) throw new Error("Failed to send quote to server");
+
+            quotes.push(newQuote);
+            saveQuotes();
+            populateCategories();
+            alert("Quote added successfully and synced with server!");
+
+        } catch (error) {
+            console.error("Error sending quote:", error);
+            alert("Quote saved locally but failed to sync with server.");
+        }
     }
 
     // Save quotes to local storage
