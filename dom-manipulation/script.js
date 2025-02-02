@@ -17,10 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to populate the category dropdown
     function populateCategories() {
         const uniqueCategories = [...new Set(quotes.map(q => q.category))];
-        categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+        categoryFilter.innerHTML = ""; // Clear previous options
+        const allOption = document.createElement("option");
+        allOption.value = "all";
+        allOption.textContent = "All Categories";
+        categoryFilter.appendChild(allOption);
+
         uniqueCategories.forEach(category => {
-            categoryFilter.innerHTML += `<option value="${category}">${category}</option>`;
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            categoryFilter.appendChild(option);
         });
+
         const savedFilter = localStorage.getItem("selectedCategory");
         if (savedFilter) categoryFilter.value = savedFilter;
     }
@@ -32,12 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
             ? quotes
             : quotes.filter(quote => quote.category === selectedCategory);
 
+        quoteDisplay.innerHTML = ""; // Clear previous quote display
+
         if (filteredQuotes.length === 0) {
-            quoteDisplay.innerHTML = "<em>No quotes available for this category.</em>";
+            const noQuoteMessage = document.createElement("em");
+            noQuoteMessage.textContent = "No quotes available for this category.";
+            quoteDisplay.appendChild(noQuoteMessage);
         } else {
             const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
             const randomQuote = filteredQuotes[randomIndex];
-            quoteDisplay.innerHTML = `<p>"${randomQuote.text}"</p><em>Category: ${randomQuote.category}</em>`;
+
+            const quoteText = document.createElement("p");
+            quoteText.textContent = `"${randomQuote.text}"`;
+
+            const quoteCategory = document.createElement("em");
+            quoteCategory.textContent = `Category: ${randomQuote.category}`;
+
+            quoteDisplay.appendChild(quoteText);
+            quoteDisplay.appendChild(quoteCategory);
         }
     }
 
@@ -73,7 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const a = document.createElement("a");
         a.href = url;
         a.download = "quotes.json";
+        document.body.appendChild(a); // Append link before clicking
         a.click();
+        document.body.removeChild(a); // Remove after download
         URL.revokeObjectURL(url);
     }
 
