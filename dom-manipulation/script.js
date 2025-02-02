@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const newQuoteCategory = document.getElementById("newQuoteCategory");
     const categorySelect = document.getElementById("categorySelect");
 
-    // Function to display a random quote
+    // Function to display a random quote using innerHTML
     function showRandomQuote() {
         const selectedCategory = categorySelect.value;
         const filteredQuotes = selectedCategory === "all"
@@ -22,15 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
             : quotes.filter(quote => quote.category === selectedCategory);
 
         if (filteredQuotes.length === 0) {
-            quoteDisplay.innerText = "No quotes available for this category.";
+            quoteDisplay.innerHTML = "<em>No quotes available for this category.</em>";
             return;
         }
 
         const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-        quoteDisplay.innerText = filteredQuotes[randomIndex].text;
+        quoteDisplay.innerHTML = `<p>"${filteredQuotes[randomIndex].text}"</p>`;
     }
 
-    // Function to add a new quote
+    // Function to add a new quote using innerHTML
     function addQuote() {
         const text = newQuoteText.value.trim();
         const category = newQuoteCategory.value.trim();
@@ -45,10 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Add category to dropdown if it's new
         if (![...categorySelect.options].some(option => option.value === category)) {
-            const newOption = document.createElement("option");
-            newOption.value = category;
-            newOption.innerText = category;
-            categorySelect.appendChild(newOption);
+            categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
         }
 
         // Clear input fields
@@ -58,16 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Quote added successfully!");
     }
 
-    // Populate category dropdown
+    // Populate category dropdown using innerHTML
     function populateCategories() {
+        let optionsHTML = '<option value="all">All</option>';
         const uniqueCategories = [...new Set(quotes.map(q => q.category))];
 
         uniqueCategories.forEach(category => {
-            const option = document.createElement("option");
-            option.value = category;
-            option.innerText = category;
-            categorySelect.appendChild(option);
+            optionsHTML += `<option value="${category}">${category}</option>`;
         });
+
+        categorySelect.innerHTML = optionsHTML;
     }
 
     // Event Listeners
